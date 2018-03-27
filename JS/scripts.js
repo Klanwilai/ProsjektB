@@ -17,11 +17,14 @@ function mainFunction(postnr){
     });
 }
 
+/**
+*   This function keeps @function mainFunction(postnr) from running until input length is 4.
+*/
 function postLength(){
     postn.setAttribute("class", "valid");
     let post = document.querySelector("#post").value;
-    binaryIndexOf(post, postalCodes);
     if(post.length >= 4) {mainFunction(post);}
+    else {sted.value=" ";}
 }
 
 /**

@@ -1,0 +1,17 @@
+*{
+    background-color: DarkOrange;
+    color: Beige;
+}
+
+input{
+    background-color: Beige;
+    color: DarkORange;
+}
+
+.invalid{
+    background-color: Red;
+}
+
+.valid{
+    background-color: Beige;
+}

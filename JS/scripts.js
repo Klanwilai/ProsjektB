@@ -3,15 +3,13 @@ const postn = document.querySelector("#post");
 
 
 function mainFunction(postnr){
-
+    var index = postalCodes.binaryIndexOf(postnr, compareValues);
 
 
     postalFromCode(postnr).then (e => {
-        for(const postalCode of postalCodes){
-            if(postnr === postalCode.nr) {console.log(e, `${postnr} is ${postalCode.sted}`); sted.value = postalCode.sted;}
-        }
+        if(index >= 0) {console.log(e, `${postnr} is ${postalCodes[index].sted}`); sted.value = postalCodes[index].sted;}
     }).catch (e => {
-        postn.setAttribute("class", "invalid");
+        postn.setAttribute("aria-invalid", "true");
         sted.value = " ";
         console.log(e, `${postnr} is invalid. `);
     });
@@ -19,10 +17,12 @@ function mainFunction(postnr){
 
 /**
 *   This function keeps @function mainFunction(postnr) from running until input length is 4.
+*   Also empties "sted" input field if "post" input length is less than 4.
 */
 function postLength(){
-    postn.setAttribute("class", "valid");
     let post = document.querySelector("#post").value;
+    postn.setAttribute("aria-invalid", "false");
+
     if(post.length >= 4) {mainFunction(post);}
     else {sted.value=" ";}
 }

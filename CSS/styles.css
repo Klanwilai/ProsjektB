@@ -8,10 +8,10 @@ input{
     color: DarkORange;
 }
 
-.invalid{
+[aria-invalid="true"]{
     background-color: #ff3232;
 }
 
-.valid{
+[aria-invalid="false"]{
     background-color: Beige;
 }

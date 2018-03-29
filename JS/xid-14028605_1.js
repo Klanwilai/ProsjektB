@@ -36,4 +36,10 @@ function binaryIndexOf(searchElement, comparator) {
   return ~maxIndex;
 }
 
+function compareValues(a, b){
+    if(a.nr > b) {return 1;}
+    else if(a.nr < b) {return -1;}
+    else {return 0;}
+}
+
 Array.prototype.binaryIndexOf = binaryIndexOf;

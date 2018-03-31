@@ -5,7 +5,12 @@
 
 input{
     background-color: Beige;
-    color: DarkORange;
+    color: DarkOrange;
+}
+
+button{
+    background-color: Beige;
+    color: DarkOrange;
 }
 
 [aria-invalid="true"]{

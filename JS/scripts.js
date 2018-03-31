@@ -1,12 +1,47 @@
 const sted = document.querySelector("#sted");
 const postn = document.querySelector("#post");
+const nr = document.querySelector("nr");
+const gatefelt = document.querySelector("#g");
+const searchURL = "http://folk.ntnu.no/oeivindk/imt1441/sok.php?q="
+let timer;
 
 
-function mainFunction(postnr){
+
+
+
+function runAutoComplete(){
+    clearTimeout(timer);
+    timer = setTimeout( e => {streetAutoComplete();}, 300);
+}
+
+function streetAutoComplete(){
+    if(gatefelt.value.length > 0){
+        console.log(gatefelt.value);
+        fetch(`${searchURL}${encodeURIComponent(gatefelt.value)}`)
+        .then(res => res.json())
+        .then(data =>{
+            console.log(data);
+            var html = "";
+            data.forEach(item => {
+                if(item.nr.length > 1){
+                    for(const itemNr of item.nr)
+                    { html += `<option>${item.gate} ${itemNr}, ${item.postnr} ${item.sted}</option>`; }
+                }
+                else
+                    { html += `<option>${item.gate}, ${item.postnr} ${item.sted}</option>`; }
+            });
+            document.querySelector("#SearchSuggestions").innerHTML = html;
+        });
+    }
+    else {console.log("empty");}
+}
+
+
+function postCodeCheck(postnr){
     var index = postalCodes.binaryIndexOf(postnr, compareValues);
 
 
-    postalFromCode(postnr).then (e => {
+    postCodeCheck(postnr).then (e => {
         if(index >= 0) {console.log(e, `${postnr} is ${postalCodes[index].sted}`); sted.value = postalCodes[index].sted;}
     }).catch (e => {
         postn.setAttribute("aria-invalid", "true");
@@ -16,14 +51,14 @@ function mainFunction(postnr){
 }
 
 /**
-*   This function keeps @function mainFunction(postnr) from running until input length is 4.
+*   This function keeps @function postCodeCheck(postnr) from running until input length is 4.
 *   Also empties "sted" input field if "post" input length is less than 4.
 */
-function postLength(){
+function postLengthCheck(){
     let post = document.querySelector("#post").value;
     postn.setAttribute("aria-invalid", "false");
 
-    if(post.length >= 4) {mainFunction(post);}
+    if(post.length >= 4) {postCodeCheck(post);}
     else {sted.value=" ";}
 }
 

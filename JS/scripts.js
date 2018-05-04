@@ -1,115 +1,90 @@
-const sted = document.querySelector("#sted");
-const postn = document.querySelector("#post");
-const nr = document.querySelector("#nr");
-const gatefelt = document.querySelector("#g");
-const searchURL = "http://folk.ntnu.no/oeivindk/imt1441/sok.php?q="
-let timer;
-let changer = false;
-let adress = {};
+const inputID = "#text-input";
+const outputID = "#word-list";
 
+  document.getElementById("submit-alphabet").addEventListener("click", e => {
+    var printObj = new MyAwesomeWordClass(inputID, outputID);
+    printObj.mainJob();
+});
 
 /**
-*   Sets delay before @function streetAutoComplete() runs
-*/
-function runAutoComplete(){
-    clearTimeout(timer);
-    timer = setTimeout( e => {streetAutoComplete();}, 300);
-}
+ * @class MyAwesomeWordClass
+ * @constructor takes @param input and @param output these are the input and output fields of the html
+ * has 3 variables, the value of the input field, and the output field.
+ * last variable @var showListedWords will hold html later to print out
+ */
 
+class MyAwesomeWordClass {
+  constructor(input, output){
+    this.in = document.querySelector(input).value;
+    this.out = document.querySelector(output);
+    this.showListedWords = "";
+  }
 
 /**
-*   Runs if field isn't empty, fetches search suggestion.
-*   If search suggestion is picked then @var changer is true, data is copied into @var adress.
-*   The other input fields are filled and @var changer is set back to false
-*/
-function streetAutoComplete(){
-    var count = 0;
-    if(gatefelt.value.length > 0){
-        console.log(gatefelt.value);
-        fetch(`${searchURL}${encodeURIComponent(gatefelt.value)}`)
-        .then(res => res.json())
-        .then(data => {
-            if(changer){
-                adress = data;
-        		postn.value = adress[0].postnr;
-        		sted.value = adress[0].sted;
-        		if(adress[0].nr.length <= 1){
-                    nr.value = adress[0].nr;
-        		}
-        		gatefelt.value = adress[0].gate;
-                changer = false;
+ * @function mainJob uses the @var in to create a words array, the words are split by the parameters of the @function split
+ * Then filtered, and lastly every element in the array is converted to upper case
+ * class @function objectCountCreator is run to create an array of objects, the object contains the word, and the word count
+ */
+
+  mainJob(){
+    var alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "Æ", "Ø", "Å"];
+    var words = this.in
+      .split(/[\n <>.,\?/()]/)
+      .filter(word => word != "")
+      .map(word => word = word.toUpperCase());
+    var showListedWords = "";
+    var wordObj = this.objectCountCreator(words);
+    this.printWordListAlph(wordObj, this.out)
+  }
+
+/**
+ * Most of the code gotten from: https://stackoverflow.com/questions/5667888/counting-the-occurrences-frequency-of-array-elements
+ * Added a @for loop at the end that puts array a and array b into the same array
+ * @return c which is an array og objects, object containing a and b
+ */
+
+  objectCountCreator(wordArr) {
+   var a = [], b = [], c = [], prev;
+
+   wordArr.sort();
+   for(var i = 0; i < wordArr.length; i++){
+       if(wordArr[i] !== prev){
+           a.push(wordArr[i]);
+           b.push(1);
+       } else{
+           b[b.length-1]++;
+       }
+       prev = wordArr[i];
+   }
+   for(var j = 0; j < a.length; j++){
+     c[j] = {id: a[j], count: b[j]};
+   }
+   return c;
+  }
+
+  /**
+   * Function that loops through every word, printing out the first leter of every word first as long as it hasn't been printed before
+   * Takes @param wO which is the word object array, and @param output which is the html div tag we want to print everything to
+   */
+
+  printWordListAlph(wO, output){
+    var prevLetter = " ";
+    var showListedWords = "";
+    output.innerHTML = "";
+
+    for(var n = 0; n < wO.length; n++){
+        // This if statement checks if the first letter is a number, numbers aren't printed
+        if(isNaN(parseInt(wO[n].id.charAt(0)), 10)){
+            // This if statement checks if var prevLetter is equal to current words first letter, if not, run code
+            if(wO[n].id.charAt(0) !== prevLetter) {
+                output.innerHTML += `<li><h1>${wO[n].id.charAt(0)}</h1></li>`;
+                // var prevLetter = first letter of current word.
+                prevLetter = wO[n].id.charAt(0);
             }
-            var html = "";
-            data.forEach(item => {
-                if(item.nr.length > 1){
-                    for(const itemNr of item.nr)
-                    { html += `<option>${item.gate} ${itemNr}, ${item.postnr} ${item.sted}</option><br>`; }
-                }
-                else
-                    { html += `<option>${item.gate}, ${item.postnr} ${item.sted}</option><br>`; }
-            });
-            temp = html.split("<br>");
-            html = "";
-            for(i = 0; i < 10; i++){
-                html += temp[i];
-            }
-            document.querySelector("#SearchSuggestions").innerHTML = html;
-            document.querySelector("#g").addEventListener("change", e => {
-                changer = true;
-            });
-        });
+
+            showListedWords = `<li>${wO[n].id}:   ${wO[n].count}</li>`;
+            output.innerHTML += showListedWords;
+        }
     }
-    else {console.log("empty");}
-}
-
-/**
-*   Takes input postcode as @param postnr and uses the @function binaryIndexOf inside the Promise postalFromCode
-*   if postnr is valid postcode, then promise is resolved and sted input fields value is set to corresponding sted to the postcode
-*/
-function postCodeCheck(postnr){
-    var index = postalCodes.binaryIndexOf(postnr, compareValues);
-
-
-    postalFromCode(postnr).then (e => {
-        if(index >= 0) {console.log(e, `${postnr} is ${postalCodes[index].sted}`); sted.value = postalCodes[index].sted;}
-    }).catch (e => {
-        postn.setAttribute("aria-invalid", "true");
-        sted.value = " ";
-        console.log(e, `${postnr} is invalid. `);
-    });
-}
-
-/**
-*   This function keeps @function postCodeCheck(postnr) from running until input length is 4.
-*   Also empties "sted" input field if "post" input length is less than 4.
-*/
-function postLengthCheck(){
-    let post = document.querySelector("#post").value;
-    postn.setAttribute("aria-invalid", "false");
-
-    if(post.length >= 4) {postCodeCheck(post);}
-    else {sted.value=" ";}
-}
-
-/**
-*   This function returns true if param exists in postalCodes arrays
-*   @param  code    the value we want to look for in array
-*/
-function exists(code){
-    for(const postalCode of postalCodes){
-        if(code === postalCode.nr) {return true;}
-    }
-    return false;
-}
-
-/**
-*   This promise is wrapped in a function
-*   @param  code    promise is resolved if @function exists returns true
-*   @function exists could be replaced with index >= 0, but then 0000 and negative numbers would return index 0 -> 0001, Oslo.
-*/
-const postalFromCode = (code) => {
-    return new Promise((resolve, reject) => {
-        if(exists(code)) {resolve("Everything is OK");}
-        else {reject(Error("Nothing is OK"));}
-    });
+  }
 }

@@ -1,22 +1,12 @@
-*{
-    background-color: DarkOrange;
-    color: Beige;
+* {
+  background-color: Black;
+  color: Gold;
 }
 
-input{
-    background-color: Beige;
-    color: DarkOrange;
+.alphabet {
+  list-style: none;
 }
 
-button{
-    background-color: Beige;
-    color: DarkOrange;
-}
-
-[aria-invalid="true"]{
-    background-color: #ff3232;
-}
-
-[aria-invalid="false"]{
-    background-color: Beige;
+.alphabet h1 {
+  font-weight: bold;
 }
